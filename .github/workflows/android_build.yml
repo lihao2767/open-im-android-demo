@@ -1,51 +1,32 @@
-# 这个工作流的名称，会显示在 GitHub Actions 界面上
-name: Android Build and Upload APK
+name: Android CI Build
 
-# 定义何时触发这个工作流
-# 当代码被推送到 master 分支时，这个任务会自动运行
 on:
   push:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
-# 定义一个名为 "build" 的任务
 jobs:
   build:
-    # 任务将在最新版本的 Ubuntu 系统上运行
     runs-on: ubuntu-latest
-    
-    # 构建任务的执行步骤
     steps:
-    # 步骤 1: 检出代码
-    # 将你的 GitHub 仓库代码下载到构建环境中
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
-    # 2: 设置 Java 环境
-    # 安装并设置 Java 17，因为大多数现代安卓项目都需要它
     - name: Set up JDK 17
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: 'gradle'
+        cache: gradle
 
-    # 3: 授予 gradlew 脚本执行权限
-    # 这是 Linux 环境下运行 Gradle 脚本的必要步骤
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # 4: 执行 Gradle 构建命令
-    # 构建项目的 Debug 版本
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+    - name: Build with Gradle
+      run: ./gradlew :Demo:assembleRelease
 
-    # 5: 上传构建产物
-    # 将构建生成的 APK 文件作为“构件”上传到 GitHub
-    # 这样你就可以下载它
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
       with:
-        name: my-app-debug-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: app-release
+        path: Demo/build/outputs/apk/release/Demo-release-unsigned.apk
