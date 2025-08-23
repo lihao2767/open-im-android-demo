@@ -21,9 +21,13 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      # 确保工作目录是项目根目录
+      working-directory: .
 
     - name: Build with Gradle
       run: ./gradlew :Demo:assembleRelease
+      # 确保工作目录是项目根目录
+      working-directory: .
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
